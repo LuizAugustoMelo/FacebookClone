@@ -1,24 +1,48 @@
-﻿body {
-    padding-top: 50px;
-    padding-bottom: 20px;
+﻿.form-horizontal.loginform {
+    color: white !important;
+    position: relative;
 }
 
-/* Set padding to keep content from hitting the edges */
-.body-content {
-    padding-left: 15px;
-    padding-right: 15px;
+    .form-horizontal.loginform label {
+        color: white !important;
+    }
+
+    .form-horizontal.loginform > div.form-group {
+        display: inline-block;
+        margin-top: 20px;
+        margin-right: 10px;
+    }
+
+div.em {
+    position: absolute;
+    right: -18vw;
+    bottom: -1vh;
+    z-index: 1;
+    display: none;
 }
 
-/* Override the default bootstrap behavior where horizontal description lists 
-   will truncate terms that are too long to fit in the left column 
-*/
-.dl-horizontal dt {
-    white-space: normal;
+
+.loginform {
+    position: relative;
 }
 
-/* Set width on the form input elements since they're 100% wide by default */
-input,
-select,
-textarea {
-    max-width: 280px;
+    .loginform .ajaxdiv {
+        position: absolute;
+        bottom: 5vh;
+        right: -1.5vw;
+    }
+
+.livesearchli {
+    width: 300px;
+    display: block;
+    padding: 10px;
+    position: relative;
+}
+
+input#searchtext{
+    position: relative;
+    margin-top: 7px;
+    margin-left: 100px;
+    padding: 5px 10px;
+    top: -5px;
 }
