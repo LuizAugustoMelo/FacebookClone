@@ -4,6 +4,208 @@
 }
 
 <div class="row">
+    <div class="col-xs-12 col-md-6">
+        <p class="userimg">
+            <img src="~/Uploads/@ViewBag.UsernameImage" />
+        </p>
+        <h2>@ViewBag.ViewingFullName (@ViewBag.Username)</h2>
 
+        @if (ViewBag.UserType == "guest")
+        {
+            <div class="friends">
+                @if (ViewBag.NotFriends == "Pending")
+                {
+                    <div class="arefriendsdiv alert alert-warning">
+                        <p>Pending friend request.</p>
+                    </div>
+                }
+                else if (ViewBag.NotFriends == "True")
+                {
+                    <div class="arefriendsdiv alert alert-info">
+                        <a href="#" class="addfriend">Add Friend</a>
+                    </div>
+                }
+                else
+                {
+                    <div class="arefriendsdiv alert alert-success">
+                        <span class="glyphicon glyphicon-thumbs-up"></span> Friend.
+                    </div>
+                }
+            </div>
+        }
+    </div>
 </div>
 
+@section Scripts{
+
+    <script src="~/Scripts/jquery.signalR-2.2.2.min.js"></script>
+
+    <script src="/signalr/hubs"></script>
+
+    <script>
+        $(document).ready(function () {
+
+
+            /*
+             * Live Search
+             */
+
+            $("input#searchtext").keyup(function (e) {
+
+                var searchVal = $("input#searchtext").val();
+
+                $("ul#livesearchul").empty();
+
+                if (searchVal == "" || searchVal == " ") return false;
+
+                var url = "profile/LiveSearch";
+
+                $.post(url, { searchVal: searchVal }, function (data) {
+
+                    if (data.length > 0) {
+                        $("ul#livesearchul").append("<li class=close>x</li>");
+                    }
+
+                    for (var i = 0; i < data.length; i++) {
+                        var obj = data[i];
+                        $("ul#livesearchul").append('<li class=livesearchli><a href="/' + obj.Username + '"><img src="uploads/' + obj.UserId + '.jpg" /> ' + obj.FirstName + ' ' + obj.LastName + '</a>"</li>');
+                    }
+
+                });
+
+            });
+
+            $("body").on("click", "ul#livesearchul li.close", function () {
+                $("ul#livesearchul").empty();
+                $("input#searchtext").val("");
+            });
+
+            ////////////////////////////////////////////////////////////
+
+
+            /*
+             * Hub
+             */
+
+            // Setup Hub connection
+            var hub = $.connection.echo;
+
+            hub.client.test = function (msg) {
+                console.log(msg);
+            }
+
+            hub.client.frnotify = function (friend, count) {
+                $("span.frnotif." + friend + "> span").text(count);
+                $("span.frnotif." + friend).addClass("red");
+            }
+
+            hub.client.frcount = function (username, count) {
+                if (count > 0) {
+                    $("span.frnotif." + username + "> span").text(count);
+                }
+                else {
+                    $("span.frnotif." + username + "> span").text("");
+                    $("span.frnotif." + username).removeClass("red");
+                }
+            }
+
+            // Connect to the Hub
+            $.connection.hub.start().done(function () {
+                hub.server.hello("signalr working");
+            });
+
+            /////////////////////////////////////////////////////////////
+
+
+            /*
+             * Add Friend
+             */
+
+            $("a.addfriend").click(function (e) {
+                e.preventDefault();
+
+                var friend = '@ViewBag.Username';
+
+                var url = "/profile/AddFriend";
+
+                $.post(url, { friend: friend }, function (data) {
+                    $('.arefriendsdiv').removeClass("alert-info").addClass("alert-warning").html('<p>Pending friend request.</p>');
+                }).done(function () {
+                    hub.server.notify(friend);
+                });
+            });
+
+            /////////////////////////////////////////////////////////////
+
+
+            /*
+             * Display Friend Request
+             */
+
+            $("body").on("click", "span.frnotif.red", function () {
+
+                $("ul#frnotiful").empty();
+
+                var url = "profile/DisplayFriendRequests";
+
+                $.post(url, { }, function (data) {
+
+                    if (data.length > 0) {
+                        $("ul#frnotiful").append("<li class=close>x</li>");
+                    }
+
+                    for (var i = 0; i < data.length; i++) {
+                        var obj = data[i];
+                        $("ul#frnotiful").append('<li class=frnotifli><a href="/' +
+                            obj.Username + '"><img src="uploads/' + obj.Id + '.jpg" /> ' +
+                            obj.FirstName + ' ' + obj.LastName + '</a>"' +
+                            '<a class=accept href=# data-id="' + obj.Id +
+                            '"><span class="glyphicon glyphicon-ok"></span></a> ' +
+                            '<a class=decline href=# data-id="' + obj.Id +
+                            '"><span class="glyphicon glyphicon-remove"></span></a> </li>');
+                    }
+
+                });
+
+            });
+
+            $("body").on("click", "ul#frnotiful li.close", function () {
+                $("ul#frnotiful").empty();
+            });
+
+            ////////////////////////////////////////////////////////////
+
+
+            /*
+             * Accept Friend Request
+             */
+
+            $("body").on("click", "a.accept", function (e) {
+                e.preventDefault();
+
+                var $this = $(this);
+
+                $("ul#frnotiful").empty();
+
+                var url = "profile/AcceptFriendRequests";
+
+                var friendId = $this.data("id");
+
+                $.post(url, { friendId: friendId }, function (data) {
+                }).done(function () {
+                    $this.parent().fadeOut("fast");
+                    hub.server.getFrcount();
+                    hub.server.getFcount(friendId);
+                });
+
+            });
+
+            $("body").on("click", "ul#frnotiful li.close", function () {
+                $("ul#frnotiful").empty();
+            });
+
+            ////////////////////////////////////////////////////////////
+
+        }); // End Ready
+    </script>
+}

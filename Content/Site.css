@@ -39,10 +39,81 @@ div.em {
     position: relative;
 }
 
-input#searchtext{
+input#searchtext {
     position: relative;
     margin-top: 7px;
     margin-left: 100px;
     padding: 5px 10px;
     top: -5px;
+}
+
+li.livesearchli img {
+    width: 50px;
+}
+
+ul#livesearchul {
+    position: absolute;
+    background: #222;
+    right: -10px;
+    top: 70px;
+    padding: 0;
+    z-index: 5;
+}
+
+    ul#livesearchul li.close,
+    ul#frnotiful li.close {
+        position: absolute;
+        color: white;
+        opacity: 1 !important;
+        right: 10px;
+        list-style: none;
+        cursor: pointer;
+        z-index: 10;
+    }
+
+.userimg img {
+    width: 200px;
+}
+
+li.name {
+    display: block;
+    color: white;
+    margin: 10px;
+    margin-top: 15px;
+}
+
+.frnotif {
+    color: white;
+}
+
+    .frnotif.red {
+        color: red;
+        cursor: pointer;
+    }
+
+li.frcountli {
+    position: relative;
+    top: 15px;
+}
+
+ul#frnotiful {
+    position: absolute;
+    right: 0;
+    top: 45px;
+    background: #222;
+}
+
+li.frcountli img {
+    width: 50px;
+}
+
+li.frnotifli {
+    width: 300px;
+    display: block;
+    padding: 10px;
+}
+
+span.frnotif > span{
+    display:inline-block;
+    margin-left: 5px;
 }
